@@ -1,0 +1,2 @@
+Các ảnh sẽ khó lên theo từng cấp
+Ngoài ra các ảnh này còn test kỹ năng type text sau khi đã biết cách clear text

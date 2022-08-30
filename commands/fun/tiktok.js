@@ -1,0 +1,43 @@
+const tiktok = require('tiktok-scraper')
+
+const { MessageEmbed } = require('discord.js');
+
+
+
+module.exports = {
+    name: 'tiktok',
+    category: 'fun',
+	run: async (client, message, args) => {
+
+await tiktok.getUserProfileInfo(config.tiktokAccount).user.id
+
+const sync = async (userID) => {
+    const cache = db.get('cache')
+    const { collector: newPosts } = await tiktok.user(userID)
+    if (newPosts.length === 0) return
+    const newPostsSorted = newPosts.sort((a, b) => b.createTime - a.createTime).slice(0, 10)
+    if (cache) {
+        const post = newPostsSorted.filter((post) => !cache.includes(post.id))[0]
+        if (post && (post.createTime > ((Date.now() - 24 * 60 * 60 * 1000) / 1000))) {
+            const author = post.authorMeta.nickName
+            const link = post.webVideoUrl
+            const embed = new Discord.MessageEmbed()
+                .setAuthor(author, client.user.displayAvatarURL())
+                .setTitle(post.text)
+                .setThumbnail(config.embed_icon_url)
+                .setImage(post.covers.default)
+                .setColor('#00FF00')
+                .setTimestamp()
+                .setFooter(author, client.user.displayAvatarURL())
+            client.channels.cache.get(config.notifChannel).send(`[@everyone]\n\n**${author} vient de poster un nouveau Tiktok !\n\nVa vite le voir ici : ${link} !**`, embed)
+        }
+    }
+    db.set('cache', newPostsSorted.map((post) => post.id))
+}
+
+
+const userID = await resolveID()
+sync(userID)
+setInterval(() => sync(userID), 120 * 1000)
+
+    }}
